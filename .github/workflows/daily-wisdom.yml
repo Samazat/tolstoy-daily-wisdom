@@ -1,0 +1,22 @@
+name: Daily Wisdom
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 6 AM UTC daily
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  send_wisdom:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Get daily wisdom
+        run: python3 wisdom.py
+        continue-on-error: false  # We want this to fail to trigger email
