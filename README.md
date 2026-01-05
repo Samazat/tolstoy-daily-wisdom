@@ -1,22 +1,26 @@
 # 📖 Мысли мудрыхъ людей на каждый день
 
-**Daily wisdom from Tolstoy's 1903 collection, delivered via GitHub's failure notifications.**
+**Daily wisdom from Tolstoy's 1903 collection, delivered via email via SMTP.**
 
 ## The Concept
 
 1. GitHub Action runs daily at 6 AM UTC
-2. It prints today's wisdom (Julian calendar corrected) to stdout
-3. Then it **intentionally fails** (exit code 1)
-4. GitHub emails you about the "failure"
-5. The email contains the wisdom in the logs
-
-It's a feature, not a bug.
+2. It retrieves today's wisdom (Julian calendar corrected)
+3. Sends a beautifully formatted email via your SMTP server
+4. You receive the wisdom directly in your inbox
 
 ## Setup
 
 1. Fork this repository
-2. Go to **Settings → Notifications** and ensure you receive emails for failed workflows
-3. That's it. You'll get wisdom every morning.
+2. Configure GitHub Secrets with your SMTP credentials:
+   - Go to **Settings → Secrets and variables → Actions**
+   - Add the following secrets:
+     - `SMTP_HOST` - Your SMTP server (e.g., `mail.serous.cloud`)
+     - `SMTP_PORT` - SMTP port (e.g., `2525`)
+     - `SMTP_USER` - SMTP username (e.g., `github`)
+     - `SMTP_PASS` - SMTP password
+     - `EMAIL_TO` - Your email address to receive the wisdom
+3. That's it! You'll get wisdom every morning.
 
 ### Adjusting the Time
 
@@ -61,21 +65,19 @@ Tolstoy wrote:
 >
 > "I know from myself what strength, peace and happiness it gives to commune with such souls as Socrates, Epictetus..."
 
+## SMTP Configuration
+
+The workflow uses your SMTP server to send emails. Make sure your SMTP server:
+- Supports authentication (username/password)
+- Uses STARTTLS (default) or SSL/TLS
+- Is accessible from GitHub Actions runners
+
+If your SMTP server uses SSL/TLS instead of STARTTLS, you can add an optional secret:
+- `SMTP_USE_TLS` - Set to `false` to use SSL/TLS instead of STARTTLS
+
 ## Contributing
 
-The entries are being transcribed from the 1903 edition. Many days are still missing. 
-
-If you'd like to help, edit `wisdom.py` and add entries in the format:
-
-```python
-(month, day): """N месяца
-
-Текстъ мудрости...
-
-— Источникъ""",
-```
-
-Keep the original pre-revolutionary orthography (ъ, ѣ, i, ѳ) where possible.
+All 366 entries have been transcribed from the 1903 edition. The collection is complete!
 
 ## License
 

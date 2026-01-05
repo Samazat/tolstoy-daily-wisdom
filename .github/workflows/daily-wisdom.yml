@@ -17,20 +17,12 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Get daily wisdom
+      - name: Send daily wisdom via email
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
         run: |
-          # Get the wisdom text first
-          WISDOM=$(python3 -c "from wisdom import get_wisdom; print(get_wisdom())")
-          
-          # Output the full wisdom (this will be in the logs and email)
-          echo "$WISDOM"
-          
-          # Also create an error annotation with a summary for the email header
-          # Extract the core wisdom text (first few lines of actual content)
-          CORE=$(echo "$WISDOM" | grep -A 20 "---" | grep -v "---" | head -3 | tr '\n' ' ' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-          
-          # Output as error annotation - this will appear prominently in the email
-          echo "::error::Daily Wisdom from Tolstoy: ${CORE:0:200}..."
-          
-          # Exit with error to trigger email notification
-          exit 1
+          python3 send_wisdom_email.py
