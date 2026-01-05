@@ -25,4 +25,12 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
         run: |
+          # Debug: Check which secrets are set (without showing values)
+          echo "Checking secrets..."
+          [ -z "$SMTP_HOST" ] && echo "❌ SMTP_HOST is not set" || echo "✅ SMTP_HOST is set"
+          [ -z "$SMTP_PORT" ] && echo "❌ SMTP_PORT is not set" || echo "✅ SMTP_PORT is set"
+          [ -z "$SMTP_USER" ] && echo "❌ SMTP_USER is not set" || echo "✅ SMTP_USER is set"
+          [ -z "$SMTP_PASS" ] && echo "❌ SMTP_PASS is not set" || echo "✅ SMTP_PASS is set"
+          [ -z "$EMAIL_TO" ] && echo "❌ EMAIL_TO is not set" || echo "✅ EMAIL_TO is set"
+          echo ""
           python3 send_wisdom_email.py
