@@ -14,16 +14,33 @@ def send_wisdom_email():
     """Send today's wisdom via email."""
     
     # Get SMTP configuration from environment variables (GitHub Secrets)
-    smtp_host = os.getenv('SMTP_HOST', 'mail.serous.cloud')
-    smtp_port = int(os.getenv('SMTP_PORT', '2525'))
-    smtp_user = os.getenv('SMTP_USER', 'github')
-    smtp_pass = os.getenv('SMTP_PASS', '')
-    email_to = os.getenv('EMAIL_TO', '')
+    smtp_host = os.getenv('SMTP_HOST', '').strip()
+    smtp_port_str = os.getenv('SMTP_PORT', '').strip()
+    smtp_user = os.getenv('SMTP_USER', '').strip()
+    smtp_pass = os.getenv('SMTP_PASS', '').strip()
+    email_to = os.getenv('EMAIL_TO', '').strip()
+    
+    # Validate and set defaults
+    if not smtp_host:
+        raise ValueError("SMTP_HOST environment variable is required (e.g., 'mail.serous.cloud')")
+    
+    if not smtp_port_str:
+        smtp_port = 2525  # Default port
+        print("Warning: SMTP_PORT not set, using default 2525")
+    else:
+        try:
+            smtp_port = int(smtp_port_str)
+        except ValueError:
+            raise ValueError(f"SMTP_PORT must be a number, got: '{smtp_port_str}'")
+    
+    if not smtp_user:
+        raise ValueError("SMTP_USER environment variable is required (e.g., 'github')")
     
     if not smtp_pass:
         raise ValueError("SMTP_PASS environment variable is required")
+    
     if not email_to:
-        raise ValueError("EMAIL_TO environment variable is required")
+        raise ValueError("EMAIL_TO environment variable is required (e.g., 'azat@gmx.net')")
     
     # Get today's wisdom
     wisdom = get_wisdom()
