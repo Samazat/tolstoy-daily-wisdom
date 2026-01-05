@@ -132,24 +132,51 @@ def send_wisdom_email():
     # Send email
     try:
         print(f"Connecting to SMTP server {smtp_host}:{smtp_port}...")
-        # Try STARTTLS first (common for port 2525)
         use_tls = os.getenv('SMTP_USE_TLS', 'true').lower() == 'true'
+        use_ssl = os.getenv('SMTP_USE_SSL', 'false').lower() == 'true'
         
-        if use_tls:
-            server = smtplib.SMTP(smtp_host, smtp_port)
-            server.starttls()  # Enable encryption
-        else:
+        if use_ssl:
             # For SSL/TLS on port 465
+            print("Using SSL/TLS connection...")
             server = smtplib.SMTP_SSL(smtp_host, smtp_port)
+        else:
+            # Try regular SMTP first
+            print("Using SMTP connection...")
+            server = smtplib.SMTP(smtp_host, smtp_port)
+            server.set_debuglevel(1)  # Enable debug output
+            
+            # Try STARTTLS if enabled
+            if use_tls:
+                try:
+                    print("Attempting STARTTLS...")
+                    server.starttls()
+                    print("STARTTLS successful")
+                except Exception as tls_error:
+                    print(f"STARTTLS failed: {tls_error}")
+                    print("Continuing without STARTTLS...")
         
+        print(f"Logging in as {smtp_user}...")
         server.login(smtp_user, smtp_pass)
+        print("Login successful!")
+        
         print(f"Sending email to {email_to}...")
         server.send_message(msg)
         server.quit()
-        print("Email sent successfully!")
+        print("✅ Email sent successfully!")
         return True
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"❌ SMTP Authentication Error: {e}")
+        print("Check your SMTP_USER and SMTP_PASS secrets")
+        raise
+    except smtplib.SMTPConnectError as e:
+        print(f"❌ SMTP Connection Error: {e}")
+        print(f"Could not connect to {smtp_host}:{smtp_port}")
+        print("Check your SMTP_HOST and SMTP_PORT secrets")
+        raise
     except Exception as e:
-        print(f"Error sending email: {e}")
+        print(f"❌ Error sending email: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         raise
 
 if __name__ == "__main__":
